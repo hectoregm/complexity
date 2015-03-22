@@ -1,0 +1,9 @@
+*.aux
+*.dvi
+*.log
+*.pdf
+*.toc
+*~
+*.out
+.DS_Store
+compiled
