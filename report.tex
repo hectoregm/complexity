@@ -21,12 +21,12 @@
 \begin{document}
 \maketitle
 \section{Sequencing with Intervals (SI)}
-El problema de calendarizacion de tareas (\textbf{SI}) se define de la siguiente manera:
+El problema de calendarización de tareas (\textbf{SI}) se define de la siguiente manera:
 
 \textbf{Ejemplar:} Se tiene un conjunto finito $T$ de tareas, y para cada $t \in T$
-se tiene un entero que significa cuando puede empezar la tarea $r(t) \geq 0$ (\texttt{release time}), un tiempo de entrega $d(y) \in \mathbb{Z}^{+}$ (\texttt{deadline}) y una duracion $l(t) \in \mathbb{Z}^{+}$ (\texttt{length})
+se tiene un entero que significa cuando puede empezar la tarea $r(t) \geq 0$ (\texttt{release time}), un tiempo de entrega $d(y) \in \mathbb{Z}^{+}$ (\texttt{deadline}) y una duración $l(t) \in \mathbb{Z}^{+}$ (\texttt{length})
 
-\textbf{Pregunta:} Existe una calendarizacion factible para $T$, es decir existe una funcion $\sigma : T \rightarrow \mathbb{Z}^{+}$ tal que para cada $t \in T$ tenemos:
+\textbf{Pregunta:} Existe una calendarización factible para $T$, es decir existe una función $\sigma : T \rightarrow \mathbb{Z}^{+}$ tal que para cada $t \in T$ tenemos:
 \begin{equation*}
   \begin{split}
     \sigma(t) \geq r(t)\\
@@ -34,7 +34,7 @@ se tiene un entero que significa cuando puede empezar la tarea $r(t) \geq 0$ (\t
     t' \in T - {t}\ \sigma(t') + l(t') \leqslant \sigma(t)\ o\ \sigma(t') \geq \sigma(t) + l(t)
   \end{split}
 \end{equation*}
-Es decir cualquier calendarizacion factible debe asignar un tiempo de inicio que respete el tiempo permitido de inicio, el tiempo de inicio de la tarea mas su duracion debe ser menor o igual a su tiempo de entrega y finalmente que la ejecuccion de una tarea no debe sobrelaparse con otra tarea.
+Es decir cualquier calendarización factible debe asignar un tiempo de inicio que respete el tiempo permitido de inicio, el tiempo de inicio de la tarea mas su duración debe ser menor o igual a su tiempo de entrega y finalmente que la ejecución de una tarea no debe sobrelaparse con otra tarea.
 
 \begin{theorem}
   SI es NP-Completo.
@@ -42,58 +42,58 @@ Es decir cualquier calendarizacion factible debe asignar un tiempo de inicio que
 \begin{proof}
   Vamos a transformar \texttt{PARTITION} a un problema \texttt{SI}. Dado un ejemplar arbitrario en \texttt{PARTITION} entonces tenemos $A$ un conjunto finito y $s(a)$ un tamaño para cada $a \in A$ y sea $B = \sum_{a \in A}  s(a)$, es decir B es la suma total de los tamaños de los elementos en $A$.
 
-  Las unidades basicas del ejemplar en \texttt{PARTITION} son los elementos individuales $a \in A$. Utilizando la tecnica del reemplazo local, haciendo un reemplazo de cada $a \in A$ por una unica tarea $t_a$ con $r(t_a) = 0,\ d(t_a) = B + 1$ y $l(t_a) = s(a)$. Se tiene una tarea ejecutora $\bar{t}$ (\texttt{enforecer}) con $r(\bar{t}) = \lceil B / 2 \rceil,\ d(\bar{t}) = \lceil (B+1) / 2 \rceil$ y $l(\bar{t}) = 1$. Este ejemplar claramente se puede construir en tiempo polinomial dado un ejempler en \texttt{PARTITION} dado para cada elemento $a \in A$ se contruye una tarea con tres enteros asociados y una tarea ejecutora con otros tres enteros asociados, por lo que el ejemplar crece de una forma $3 |A| + 3$, que es polinomial.
+  Las unidades básicas del ejemplar en \texttt{PARTITION} son los elementos individuales $a \in A$. Utilizando la técnica del reemplazo local, haciendo un reemplazo de cada $a \in A$ por una única tarea $t_a$ con $r(t_a) = 0,\ d(t_a) = B + 1$ y $l(t_a) = s(a)$. Se tiene una tarea ejecutora $\bar{t}$ (\texttt{enforecer}) con $r(\bar{t}) = \lceil B / 2 \rceil,\ d(\bar{t}) = \lceil (B+1) / 2 \rceil$ y $l(\bar{t}) = 1$. Este ejemplar claramente se puede construir en tiempo polinomial dado un ejemplar en \texttt{PARTITION} dado para cada elemento $a \in A$ se construye una tarea con tres enteros asociados y una tarea ejecutora con otros tres enteros asociados, por lo que el ejemplar crece de una forma $3 |A| + 3$, que es polinomial.
 
   Las restricciones impuestas a los calendarios factibles por la tarea ejecutora
   son las siguientes:
   \begin{itemize}
-  \item Asegura que una calendariacion factible no puede ser construida si $B$ es un entero impar (en cuyo caso el conjunto $A'$ no exiete para el ejemplar \texttt{PARTITION}), puesto que por la definicion dada antes tendriamos que $r(\bar{t}) =d(\bar{t})$, lo que evitaria que se pueda calendarizar la tarea ejecutora. Por lo que B tiene que ser un entero par.
-  \item Dado que B es un entero par tenemos que $r(\bar{t}) = B / 2$ y $d(\bar{t}) = r(\bar{t}) + 1$, por lo que cualquier calendarizacion factible debe asignar $\sigma(\bar{t}) = B / 2$, para que la tarea ejecutora sea realizada dentro de las restricciones dadas. Esto induce una particion dividiendo el tiempo disponible para realizar las tareas por realizar en dos bloques separados por la tarea ejecutora, cada bloque con un tamaño total de $B / 2$.
+  \item Asegura que una calendarización factible no puede ser construida si $B$ es un entero impar (en cuyo caso el conjunto $A'$ no existe para el ejemplar \texttt{PARTITION}), puesto que por la definición dada antes tendríamos que $r(\bar{t}) =d(\bar{t})$, lo que evitaría que se pueda calendarizar la tarea ejecutora. Por lo que B tiene que ser un entero par.
+  \item Dado que B es un entero par tenemos que $r(\bar{t}) = B / 2$ y $d(\bar{t}) = r(\bar{t}) + 1$, por lo que cualquier calendarización factible debe asignar $\sigma(\bar{t}) = B / 2$, para que la tarea ejecutora sea realizada dentro de las restricciones dadas. Esto induce una partición dividiendo el tiempo disponible para realizar las tareas por realizar en dos bloques separados por la tarea ejecutora, cada bloque con un tamaño total de $B / 2$.
   \end{itemize}
 
-  Asi el problema de calendarizacion se reduce a un problema de seleccion de subconjuntos, aquellos que son calendarizados antes de $\bar{t}$ y aquellos calendarizados despues de $\bar{t}$. Como el tiempo total disponible de los dos bloques da un total igual a $B$, se sigue que cada bloque debe ser llenado exactamente. Sin embargo esto solo es posible si y solo si existe un subconjunto $A' \subseteq A$ tal que:
+  Así el problema de calendarización se reduce a un problema de selección de subconjuntos, aquellos que son calendarizados antes de $\bar{t}$ y aquellos calendarizados después de $\bar{t}$. Como el tiempo total disponible de los dos bloques da un total igual a $B$, se sigue que cada bloque debe ser llenado exactamente. Sin embargo esto solo es posible si y solo si existe un subconjunto $A' \subseteq A$ tal que:
 
   \begin{equation*}
     \sum_{a \in A'} s(a) = B / 2 = \sum_{a \in A - A'} s(a)
   \end{equation*}
 
-  Asi el subconjunto buscado $A'$ existe para el ejemplar en \texttt{PARTITION} si y solo si una calendarizacion factible existe para el correspondiente ejemplar en \texttt{SI}
+  Así el subconjunto buscado $A'$ existe para el ejemplar en \texttt{PARTITION} si y solo si una calendarización factible existe para el correspondiente ejemplar en \texttt{SI}
 \end{proof}
 
 \section{Direct Hamiltonian Path (DHP)}
-El problema de encontrar un camino en una grafica dirigida/no digiriga $G$ tal que visite todos los vertices de la grafica una sola vez se le llama camino hamiltoniano (\textbf{DHP}). Si el ultimo vertice visitado es adyacente al primero se dice que el camino es un ciclo hamiltoniano (\textbf{DHC}).
+El problema de encontrar un camino en una gráfica dirigida/no dirigida $G$ tal que visite todos los vértices de la gráfica una sola vez se le llama camino hamiltoniano (\textbf{DHP}). Si el ultimo vértice visitado es adyacente al primero se dice que el camino es un ciclo hamiltoniano (\textbf{DHC}).
 
 Se define de la siguiente manera:
 
 \textbf{Ejemplar:}
-Una grafica dirigida $G$ con dos vertices distringuidos $u$ y $v$.
+Una gráfica dirigida $G$ con dos vértices distinguidos $u$ y $v$.
 
 \textbf{Pregunta:}
-La grafica G contiene una camino dirigido hamiltoniano entre los vertices $u$ y $v$.
+La gráfica G contiene una camino dirigido hamiltoniano entre los vértices $u$ y $v$.
 
 \begin{theorem}
   DHP es NP-Completo.
 \end{theorem}
 \begin{proof}
-  Vamos a demostrar que $VC\ \alpha\ DHP$. Primero describimos la construccion de un ejemplar especifico en $DHP$ a partir de un ejemplar especifico de $VC$ con la ayuda de la siguiente figura:
+  Vamos a demostrar que $VC\ \alpha\ DHP$. Primero describimos la construcción de un ejemplar especifico en $DHP$ a partir de un ejemplar especifico de $VC$ con la ayuda de la siguiente figura:
 
   \jcimage{0.7}{figura-dhp.jpg}{Figura 1}
 
-  Se vera que la construccion es facilmente generalizable., en la figura(a) tenemos un ejemplar de $VC$ con una grafica $G$ y un entero $k = 2$. cada arista $(u,v)$ de $G$ tiene dos identificadores $e(u,l)$ y $e(v,m)$ donde se indica que $(u,v)$ es el $l$-esima arista incidente a $u$ y que es la $s$-esima arista incidente a $v$. Ahora construimos el ejemplar para $DHP$ con la grafica $G'$ con dos vertices distinguidos $u_0$ y $u_k$. Esto se realiza en tres etapas.
+  Se vera que la construcción es fácilmente generalizable., en la figura(a) tenemos un ejemplar de $VC$ con una gráfica $G$ y un entero $k = 2$. cada arista $(u,v)$ de $G$ tiene dos identificadores $e(u,l)$ y $e(v,m)$ donde se indica que $(u,v)$ es el $l$-esima arista incidente a $u$ y que es la $s$-esima arista incidente a $v$. Ahora construimos el ejemplar para $DHP$ con la gráfica $G'$ con dos vértices distinguidos $u_0$ y $u_k$. Esto se realiza en tres etapas.
 
-  Por cada vertice $v$ de $G$, la grafica $G'$ contiene $2 \times d(v)$ vertices donde $d(v)$ es el grado del vertice $v$. Estos vertices estan ligados por un camino dirigido, que llamamos el subcamino de $v$. Para completar la primera etapa de construccion, que se muestra en la figura(b) añadimos $(k + 1)$ vertices a $G'$: $u_0, u_1$ y $u_2$.
+  Por cada vértice $v$ de $G$, la gráfica $G'$ contiene $2 \times d(v)$ vértices donde $d(v)$ es el grado del vértice $v$. Estos vértices están ligados por un camino dirigido, que llamamos el subcamino de $v$. Para completar la primera etapa de construcción, que se muestra en la figura(b) añadimos $(k + 1)$ vértices a $G'$: $u_0, u_1$ y $u_2$.
 
-  La segunda etapa de la construccion consiste en añadir arista desde $v_o$ y $u_1$ (es decir, desde $u_o,u_1, ..., u_{k-1}$) a la cola de cada subcamino de $v$ y añadir aristas desde la cabeza de cada subcamino de $v$ a los vertices $u_1$ y $u_2$ (es decir, desde $u_1,u_2, ..., u_k$). Esta etapa se muestra en la figura(c).
+  La segunda etapa de la construcción consiste en añadir arista desde $v_o$ y $u_1$ (es decir, desde $u_o,u_1, ..., u_{k-1}$) a la cola de cada subcamino de $v$ y añadir aristas desde la cabeza de cada subcamino de $v$ a los vértices $u_1$ y $u_2$ (es decir, desde $u_1,u_2, ..., u_k$). Esta etapa se muestra en la figura(c).
 
-  Finalmente en la tercera etapa si las aristas $e(u,l)$ y $e(v,m)$ identifican la misma arista en $G$, entonces la cabeza/cola del $(2l-1)$-esimo arco del subcamino de $u$ es ligado en ambas direcciones a la cabeza/cola  del $(2m-1)$-esimo arco en el subcamino de $v$. La figura(d) muestra solamanete los arcos adicionales añadidos en la tercera etapa, usaremos este ejemplar especifico como guia para describir la construccion de $G'$ para un ejemplar arbitrario.
+  Finalmente en la tercera etapa si las aristas $e(u,l)$ y $e(v,m)$ identifican la misma arista en $G$, entonces la cabeza/cola del $(2l-1)$-esimo arco del subcamino de $u$ es ligado en ambas direcciones a la cabeza/cola  del $(2m-1)$-esimo arco en el subcamino de $v$. La figura(d) muestra solamente los arcos adicionales añadidos en la tercera etapa, usaremos este ejemplar especifico como guía para describir la construcción de $G'$ para un ejemplar arbitrario.
 
-  Sea $G$ y $k$ un ejemplar de $VC$ y sea $G'$ un grafica ejemplar de $DHP$ construida a partir de $G$. Para cada vertice $v$ de $G$ se tienen $2 \times d(v)$ vertices en $G'$, cada uno denotado por una tripleta: $(v, i, 1)$ y $(v, i, 2)$ para todo $i$ con $1 \leqslant i \leqslant d(v)$. Hay un camino dirigido por cada conjunto de estos vertices, llamado el subcamino de $v$, que consiste de las siguientes aristas (en direccion del primer vertice al segundo vertice):
+  Sea $G$ y $k$ un ejemplar de $VC$ y sea $G'$ un gráfica ejemplar de $DHP$ construida a partir de $G$. Para cada vértice $v$ de $G$ se tienen $2 \times d(v)$ vértices en $G'$, cada uno denotado por una tripleta: $(v, i, 1)$ y $(v, i, 2)$ para todo $i$ con $1 \leqslant i \leqslant d(v)$. Hay un camino dirigido por cada conjunto de estos vértices, llamado el subcamino de $v$, que consiste de las siguientes aristas (en dirección del primer vértice al segundo vértice):
 
   \begin{equation*}
     ((v,i,1),(v,i,2))\ y\ ((v,i,2),(v,i+1,1))\ \forall i, 1 \leqslant i \leqslant d(v)
   \end{equation*}
 
-  $G'$ tambien contiene el conjunto de vertices ${ u_o, u_1, ..., u_k }$ y las aristas:
+  $G'$ también contiene el conjunto de vértices ${ u_o, u_1, ..., u_k }$ y las aristas:
   \begin{equation*}
     (u_i, (v,1,1))\ \forall i, 0 \leqslant i < k
   \end{equation*}
@@ -102,22 +102,22 @@ La grafica G contiene una camino dirigido hamiltoniano entre los vertices $u$ y 
     ((v,d(v),2),u_1)\ \forall i, 0 < i \leqslant k
   \end{equation*}
   
-  Finalmente, $G'$ tambien contiene las aristas:
+  Finalmente, $G'$ también contiene las aristas:
   \begin{equation*}
     ((u,i,1),(v,j,1))\ y\ ((u,i,2),(v,j,2))
   \end{equation*}
   donde cada arista en $G$ que esta identificada por $e(u,i)$ y $e(v,j)$.
 
-  Para completar la construccion del ejemplar para $DHP$ simplemente especificamos que el vertice inicial es $u_o$ y como vertice final a $u_l$ del camino hamiltoniano a proponer. Por la construccion anterior es facilmente  ver que el numero de vertices y numero de aristas en $G'$ estan acotadas por un polinomio en $n$, el numero de vertice en $G$, por lo tanto la construccion se puede realizar en un tiempo polinomial.
+  Para completar la construcción del ejemplar para $DHP$ simplemente especificamos que el vértice inicial es $u_o$ y como vértice final a $u_l$ del camino hamiltoniano a proponer. Por la construcción anterior es fácilmente  ver que el numero de vértices y numero de aristas en $G'$ están acotadas por un polinomio en $n$, el numero de vértice en $G$, por lo tanto la construcción se puede realizar en un tiempo polinomial.
 
-  Para completar la demostracion necesitamos mostrar que $G$ tiene un cubierta de vertices de tamaño $k$ o menor si y solo si existe un camino hamiltoniano desde $u_o$ a $u_k$ en $G'$.
+  Para completar la demostración necesitamos mostrar que $G$ tiene un cubierta de vértices de tamaño $k$ o menor si y solo si existe un camino hamiltoniano desde $u_o$ a $u_k$ en $G'$.
 
-  Primero supongamos que $G$ tiene una cubierta de ertices de tamaño $\leqslant k$, entonces podemos tomar una cubierta de vertices con exactamente $k$ vertices, si era menor a k la cubierta el añadir mas vertices este conjunto sigue siendo una cubierta de vertices solo se tiene redundancia en cubrir las aristas de la grafica. Denotamos a esta cubierta por $C = {v_1, v_2, ..., v_k}$.
+  Primero supongamos que $G$ tiene una cubierta de vértices de tamaño $\leqslant k$, entonces podemos tomar una cubierta de vértices con exactamente $k$ vértices, si era menor a k la cubierta el añadir mas vértices este conjunto sigue siendo una cubierta de vértices solo se tiene redundancia en cubrir las aristas de la gráfica. Denotamos a esta cubierta por $C = {v_1, v_2, ..., v_k}$.
 
-  Un camino hamiltoniano puede ser construido de la siguiente manera. La primera arista del camino es $(u_o, (v_1,1,1))$ seguido por el subcamino de $v_1$ seguido de la arista $((v_1, d(v_1),2), u_1)$; luego hacemos algo similar para pasar de $u_1$ a $u_2$ por medio del subcamino de $v_2$ y asi sucesivamente hastsa llegar al vertice $u_k$. El camino descrito de $u_0$ a $u_k$ no contiene los vertices de los subcaminos de $v_l$ donde $l > k$. Supongamos que $(u,v)$ es una arista en $G$ identificada con $e(u,i)$ y $e(v,j)$ y que $u \notin C$. Podemos incluir a $(u,i,1)$ y a $(u,i,2)$ en el camino tomando un desvio desde el subcamino de $v$ de la siguiente formaL reemplazamos la arista  $((v,j,1),(v,j,2))$ por la secuencia $((v,j,1),(u,i,1)),((u,i,1),(u,i,2))$ y $((u,i,2),(v,j,2))$. Todo vertice en los subcaminos sin usar $v_l$ pueden ser incluidos de esta forma dado que por la construccion de $G'$ garantiza que las aristas necesarias esten presentes dado que $C$ es una cubierta de vertices.
+  Un camino hamiltoniano puede ser construido de la siguiente manera. La primera arista del camino es $(u_o, (v_1,1,1))$ seguido por el subcamino de $v_1$ seguido de la arista $((v_1, d(v_1),2), u_1)$; luego hacemos algo similar para pasar de $u_1$ a $u_2$ por medio del subcamino de $v_2$ y así sucesivamente hasta llegar al vértice $u_k$. El camino descrito de $u_0$ a $u_k$ no contiene los vértices de los subcaminos de $v_l$ donde $l > k$. Supongamos que $(u,v)$ es una arista en $G$ identificada con $e(u,i)$ y $e(v,j)$ y que $u \notin C$. Podemos incluir a $(u,i,1)$ y a $(u,i,2)$ en el camino tomando un desvío desde el subcamino de $v$ de la siguiente formaL reemplazamos la arista  $((v,j,1),(v,j,2))$ por la secuencia $((v,j,1),(u,i,1)),((u,i,1),(u,i,2))$ y $((u,i,2),(v,j,2))$. Todo vértice en los subcaminos sin usar $v_l$ pueden ser incluidos de esta forma dado que por la construcción de $G'$ garantiza que las aristas necesarias estén presentes dado que $C$ es una cubierta de vértices.
 
   \jcimage{0.7}{figura2-dhp.jpg}{Figura 2}
 
-  Ahora para el regreso, supongamos que $G'$ tiene camino dirigido hamiltoniano desde $u_0$ hasta $u_k$. Sipongo que $(u,v)$ es una arista en $G$ identificada por $e(u,i)$ y $e(u,j)$ y considerese los vertices $(u,i,1),(u,i,2),(v,j1)$ y $v,j,2$ en $G'$. Estos son mostrados en la figura 2(a). Un camino hamiltoniano que pase por estos vertices solo puede atraversarlos desde $U$ y/o por $V$. Para poder incluir todos estos vertces en un camino hamiltoniano solo tres caminos son posibles para ellos que son mostrados en la figura 2(b). Asi un camino hamiltoniano que entra por $U$ debe salir por $W$ y si se entra por $V$ se debe salir por $X$. Esto significa que si $(v,1,1)$ es acercada desde un $u_i$ en el camino hamiltoniano, entonces cada vertice en el subcamino de $v$ es visitado antes de que otro (es decir diferente) $u_i$ sea visitado al atravezar la arista $((v,d(v),2), u_i)$. Bajo este escenario se dice que el camino hamiltoniano esta usando el subcamino de $v$. Dada nuestra suposicion de que $G'$ contiene un camino hamiltoniano, $H$, construimos una cubierta de vertices $C$, de tamaño $k$ para $G$ al incluir en $C$ cada uno de los vertices cuyos subcaminos sean usados por $H$. De forma que cada uno de los vertices $(u,i,1),(u,i,2),(v,j,1)$ y $(v,j,2)$ esten incluidos en $H$ al menos uno de los subcaminos de $u$ y $v$ deben ser usados, asi que la arista $(u,v) \in G$  esta cubierta por $C$.
+  Ahora para el regreso, supongamos que $G'$ tiene camino dirigido hamiltoniano desde $u_0$ hasta $u_k$. Supongamos que $(u,v)$ es una arista en $G$ identificada por $e(u,i)$ y $e(u,j)$ y considerese los vértices $(u,i,1),(u,i,2),(v,j1)$ y $v,j,2$ en $G'$. Estos son mostrados en la figura 2(a). Un camino hamiltoniano que pase por estos vértices solo puede atravesarlos desde $U$ y/o por $V$. Para poder incluir todos estos vértices en un camino hamiltoniano solo tres caminos son posibles para ellos que son mostrados en la figura 2(b). Así un camino hamiltoniano que entra por $U$ debe salir por $W$ y si se entra por $V$ se debe salir por $X$. Esto significa que si $(v,1,1)$ es acercada desde un $u_i$ en el camino hamiltoniano, entonces cada vértice en el subcamino de $v$ es visitado antes de que otro (es decir diferente) $u_i$ sea visitado al atravesar la arista $((v,d(v),2), u_i)$. Bajo este escenario se dice que el camino hamiltoniano esta usando el subcamino de $v$. Dada nuestra suposición de que $G'$ contiene un camino hamiltoniano, $H$, construimos una cubierta de vértices $C$, de tamaño $k$ para $G$ al incluir en $C$ cada uno de los vértices cuyos subcaminos sean usados por $H$. De forma que cada uno de los vértices $(u,i,1),(u,i,2),(v,j,1)$ y $(v,j,2)$ estén incluidos en $H$ al menos uno de los subcaminos de $u$ y $v$ deben ser usados, así que la arista $(u,v) \in G$  esta cubierta por $C$.
 \end{proof}
 \end{document}
