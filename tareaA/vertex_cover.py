@@ -1,3 +1,5 @@
+from random import randrange
+
 class Graph(object):
 
     def __init__(self, graph_adj_list={}):
@@ -66,16 +68,37 @@ class Graph(object):
             res += str(edge) + " "
         return res
 
+    def approx_vertex_cover(self):
+        vertex_cover = []
+        edges = self.edges()
+
+        while(len(edges) != 0):
+            random_index = randrange(0, len(edges))
+            edge = edges.pop(random_index)
+            (vertex_u, vertex_v) = tuple(edge)
+
+            vertex_cover.append(vertex_u)
+            vertex_cover.append(vertex_v)
+
+            temp = []
+            for edge in edges:
+                if (not vertex_u in edge) and (not vertex_v in edge):
+                    temp.append(edge)
+
+            edges = temp
+
+        return vertex_cover
 
 if __name__ == "__main__":
 
     
-    g = { "a" : ["d"],
-          "b" : ["c"],
-          "c" : ["b", "c", "d", "e"],
-          "d" : ["a", "c"],
-          "e" : ["c"],
-          "f" : []
+    g = { "a" : ["b"],
+          "b" : ["a", "c"],
+          "c" : ["b", "e", "d"],
+          "d" : ["c", "e", "f", "g"],
+          "e" : ["c", "d", "f"],
+          "f" : ["d", "e"],
+          "g" : ["d"]
         }
 
 
@@ -89,5 +112,4 @@ if __name__ == "__main__":
 
     print graph
 
-    graph.add_edge({"w", "z"})
-    print graph
+    print graph.approx_vertex_cover()
