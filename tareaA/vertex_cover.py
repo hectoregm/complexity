@@ -69,23 +69,33 @@ class Graph(object):
         return res
 
     def approx_vertex_cover(self):
+        """
+        Approximation algorithm to construct a near-optimal vertex cover
+        for an undirected graph. Algorithm from Cormen 2ed (pag 1024)
+
+        Returns:
+            A list with the near-optimal vertex cover for the graph.
+        """
+        # Initial cover is empty
         vertex_cover = []
+        # A copy of the edges of the original graph
         edges = self.edges()
 
+        # We loop while there is an edge
         while(len(edges) != 0):
+            # We select an random edge.
             random_index = randrange(0, len(edges))
             edge = edges.pop(random_index)
+
+            # We get the vertex of the choosen edge
             (vertex_u, vertex_v) = tuple(edge)
 
+            # We add this vertex to the cover
             vertex_cover.append(vertex_u)
             vertex_cover.append(vertex_v)
 
-            temp = []
-            for edge in edges:
-                if (not vertex_u in edge) and (not vertex_v in edge):
-                    temp.append(edge)
-
-            edges = temp
+            # Remove edges that are incident to vertex_u and/or vertex_v
+            edges = [edge for edge in edges if (not vertex_u in edge) and (not vertex_v in edge)]
 
         return vertex_cover
 
