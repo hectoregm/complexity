@@ -3,6 +3,9 @@ from union_find import *
 import operator
 
 class Node(object):
+    """
+    Class that represents a node in a tree.
+    """
     def __init__(self, label):
         self.label = label
         self.parent = None
@@ -14,30 +17,46 @@ class Node(object):
     def add_child(self, node):
         node.parent = self
         self.children.append(node)
+
     def __str__(self):
         return self.label
+
     def preorder(self):
-        print self.label
+        array = []
+        array.append(self.label)
         for child in self.children:
-            child.preorder()
+            array += child.preorder()
+
+        return array
 
 class Vertex(object):
+    """
+    Class that represents a vertex in a graph.
+    """
+
     def __init__ (self, label):
         self.label = label
+
     def __str__(self):
         return self.label
+
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.label == other.label
         return NotImplemented
+
     def __ne__(self, other):
         if isinstance(other, self.__class__):
             return not self.__eq__(other)
         return NotImplemented
+
     def __hash__(self):
         return hash(self.label)
 
 class Graph(object):
+    """
+    Class that represents a graph
+    """
 
     def __init__(self, graph_adj_list={}):
         """ Initializes a graph object """
@@ -96,13 +115,13 @@ class Graph(object):
                     edges.append({vertex, neighbour})
         return edges
 
-    def edges_objects(self):
-        """ A static method generating the edges of the 
-            graph "graph". Edges are represented as sets 
-            with one (a loop back to the vertex) or two 
-            vertices 
+    def vertices_and_edges(self):
         """
-        temp_edges = []
+        Returns a dict with the vertices from the graph and
+        a list with the edges of the graph. The vertices are
+        represented using the Vertex class.
+        """
+        tedges = []
         vertices = {}
         edges = []
 
@@ -112,8 +131,8 @@ class Graph(object):
         for vertex in self.graph_adj_list:
             for neighbour in self.graph_adj_list[vertex]:
                 
-                if {neighbour, vertex} not in temp_edges:
-                    temp_edges.append({vertex, neighbour})
+                if {neighbour, vertex} not in tedges:
+                    tedges.append({vertex, neighbour})
                     edges.append({vertices[vertex], vertices[neighbour]})
 
         return (vertices, edges)
@@ -159,8 +178,18 @@ class Graph(object):
         return vertex_cover
 
     def kruskal(self, weighs):
-        tree = []
-        (vertices, edges) = self.edges_objects()
+        """
+        Implementation of Kruskal algorithm to calculate the Minimum Spanning Tree
+        of a graph.
+
+        Args:
+            A dict that has as keys the tuples representing a given edge, and their weigh as the value
+
+        Returns:
+            A list with the near-optimal vertex cover for the graph.
+        """
+        mst = []
+        (vertices, edges) = self.vertices_and_edges()
 
         for label, vertex in vertices.iteritems():
             MakeSet(vertex)
@@ -169,34 +198,50 @@ class Graph(object):
         for (edge, weigh) in weighs:
             (vertex_u, vertex_v) = tuple(edge)
             if Find(vertices[vertex_u]) != Find(vertices[vertex_v]):
-                tree.append(edge)
+                mst.append(edge)
                 Union(vertices[vertex_u], vertices[vertex_v])
 
-        return tree
+        return mst
 
     def approx_tsp_tour(self, weighs):
+        """
+        Implementation of the approximation algorithm to calculate a near-optimal
+        tour for a TSP problem
+
+        Args:
+            A dict that has as keys the tuples representing a given edge, and their weigh as the value
+
+        Returns:
+            A list with the near-optimal tour for the given graph
+        """
+        # Calculate the MST for the graph
         mst = self.kruskal(weighs)
+
+        # Initialize tour
         tour = []
 
+        # Create a node for each vertex
         nodes = {}
         for vertex in self.vertices():
             nodes[vertex] = Node(vertex)
 
+        # From the edges of the MST create the corresponding tree.
         for edge in mst:
             (vertex_u, vertex_v) = edge
             parent = nodes[vertex_u]
             child = nodes[vertex_v]
             parent.add_child(child)
 
-        root = nodes["c"]
+        root = nodes[self.vertices()[-1]]
+        # Get the root of the tree
         while(root.parent != None):
             root = root.parent
 
-        root.preorder()
+        # Get the preorder walk of the tree, that is our tour
+        return root.preorder()
 
 if __name__ == "__main__":
-
-    
+    # Example graph from Cormen (page 1025)
     g = { "a" : ["b"],
           "b" : ["a", "c"],
           "c" : ["b", "e", "d"],
@@ -216,6 +261,7 @@ if __name__ == "__main__":
            "h" : ["a", "b", "c", "d", "e", "f", "g"]
         }
 
+    # Example graph from Cormen (page 1029)
     g2_weighs = {
         ("a", "b"): 2, ("a", "c"): 3.16, ("a", "d"): 2, ("a", "e"): 3.16, ("a", "f"): 2.82, ("a", "g"): 4.47, ("a", "h"): 4.12,
         ("b", "c"): 1.41, ("b", "d"): 2.82, ("b", "e"): 3.16, ("b", "f"): 2, ("b", "g"): 4, ("b", "h"): 2.23,
@@ -229,21 +275,15 @@ if __name__ == "__main__":
 
     graph = Graph(g)
 
-    print("Vertices of graph:")
-    print(graph.vertices())
-
-    print("Edges of graph:")
-    print(graph.edges())
-
+    print "Graph G"
     print graph
 
-    print graph.approx_vertex_cover()
-
-    print graph.edges()
+    print "Approx Vertex Cover: %s" % graph.approx_vertex_cover()
 
     graph2 = Graph(g2)
 
-    print "Kruskal"
-    print graph2.kruskal(g2_weighs)
+    print "Graph G2"
+    print graph2
 
-    graph2.approx_tsp_tour(g2_weighs)
+    print "Kruskal: %s" % graph2.kruskal(g2_weighs)
+    print "Approx TSP tour: %s" % graph2.approx_tsp_tour(g2_weighs)
