@@ -1,0 +1,236 @@
+
+\documentclass{article}
+\usepackage[left=2cm,right=2cm,top=3cm,bottom=3cm,letterpaper]{geometry}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage{verbatim, array}
+\usepackage{hyperref}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsthm}
+\newtheorem{theorem}{Teorema}
+
+
+\newcommand{\jimage}[2]{\includegraphics[width=#1\textwidth]{#2}\vskip10pt}
+\newcommand{\jcimage}[2]{\begin{center}\includegraphics[width=#1\textwidth]{#2}\end{center}\vskip10pt}
+
+\author{Héctor Enrique Gómez Morales}
+\title{Algoritmos Geneticos}
+\begin{document}
+\maketitle
+\section{Datos iniciales}
+\begin{equation*}
+  \begin{matrix}
+    &  1& 2 & 3&  4&  5&  6& 7\\
+    1&  0&  4&  4&  1& 2&  4& 2\\
+    2&  4&  0&  8&  4&  6&  3& 6\\
+    3&  4&  8&  0&  5&  2&  8& 2\\
+    4&  1&  4&  5&  0&  3&  3& 3\\
+    5&  2&  6&  2&  3&  0&  6& 1\\
+    6&  4&  3&  8&  3&  6&  0& 6\\
+    7&  2&  6&  2&  3&  1&  6& 0
+  \end{matrix}
+\end{equation*}
+\begin{equation*}
+  \begin{split}
+    P_1: (1,2,3,4,5,6,7); P_1: 1 \overset{4}{\rightarrow} 2 \overset{8}{\rightarrow} 3 \overset{5}{\rightarrow} 4 \overset{3}{\rightarrow} 5 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 7 \overset{2}{\rightarrow} 1\\
+    w(P_1) = 4 + 8 + 5 + 3 + 6 + 6 + 2 = 34
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    P_2: (3,1,4,2,7,6,5); P_2: 3 \overset{4}{\rightarrow} 1 \overset{1}{\rightarrow} 4 \overset{4}{\rightarrow} 2 \overset{6}{\rightarrow} 7 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 5 \overset{2}{\rightarrow} 3\\
+    w(P_1) = 4 + 1 + 4 + 6 + 6 + 6 + 2 = 29
+  \end{split}
+\end{equation*}
+\section{Cruce}
+\subsection{One Point Crossover}
+\begin{equation*}
+  \begin{split}
+    P_1: (\boxed{1,2,3,4},5,6,7)\\
+    P_2: (\boxed{3,1,4,2},7,6,5)
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_1: (\boxed{1,2,3,4},7,6,5) H_1: 1 \overset{4}{\rightarrow} 2 \overset{8}{\rightarrow} 3 \overset{5}{\rightarrow} 4 \overset{3}{\rightarrow} 7 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 5 \overset{2}{\rightarrow} 1\\
+    w(H_1) = 4 + 8 + 5 + 3 + 6 + 6 + 2 = 34\\
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_2: (\boxed{3,1,4,2},5,6,7) H_2: 3 \overset{4}{\rightarrow} 1 \overset{1}{\rightarrow} 4 \overset{4}{\rightarrow} 2 \overset{6}{\rightarrow} 5 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 7 \overset{2}{\rightarrow} 3\\
+    w(H_2) = 4 + 1 + 4 + 6 + 6 + 6 + 2 = 29\\
+  \end{split}
+\end{equation*}
+
+\subsection{Two Points Crossover}
+\begin{equation*}
+  \begin{split}
+    P_1: (1,2,\boxed{3,4,5},6,7)\\
+    P_2: (3,1,\boxed{4,2,7},6,5)
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_1: (1,2,\boxed{4,2,7},6,7)\\
+    H_1: (1,2,4,3,5,6,7) H_1: 1 \overset{4}{\rightarrow} 2 \overset{4}{\rightarrow} 4 \overset{5}{\rightarrow} 3 \overset{2}{\rightarrow} 5 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 7 \overset{2}{\rightarrow} 1\\
+    w(H_1) = 4 + 4 + 5 + 2 + 6 + 6 + 2 = 29\\
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_2: (3,1,\boxed{3,4,5},6,5)\\
+    H_2: (3,1,2,4,7,6,5) H_2: 3 \overset{4}{\rightarrow} 1 \overset{4}{\rightarrow} 2 \overset{4}{\rightarrow} 4 \overset{3}{\rightarrow} 7 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 5 \overset{2}{\rightarrow} 3\\
+    w(H_2) = 4 + 4 + 4 + 3 + 6 + 6 + 2 = 29\\
+  \end{split}
+\end{equation*}
+
+\subsection{Partial Matching Crossover}
+\begin{equation*}
+  \begin{split}
+    P_1: (1,2,\boxed{3,4,5},6,7)\\
+    P_2: (3,1,\boxed{4,2,7},6,5)
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_1: (3,1,\boxed{3,4,5},6,5)\\
+    H_1: (2,1,3,4,5,6,7) H_1: 2 \overset{4}{\rightarrow} 1 \overset{4}{\rightarrow} 3 \overset{5}{\rightarrow} 4 \overset{3}{\rightarrow} 5 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 7 \overset{6}{\rightarrow} 2\\
+    w(H_1) = 4 + 4 + 5 + 3 + 6 + 6 + 6 = 34\\
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_2: (1,2,\boxed{4,2,7},6,7)\\
+    H_2: (1,3,4,2,7,6,5) H_2: 1 \overset{4}{\rightarrow} 3 \overset{5}{\rightarrow} 4 \overset{4}{\rightarrow} 2 \overset{6}{\rightarrow} 7 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 5 \overset{2}{\rightarrow} 1\\
+    w(H_2) = 4 + 5 + 4 + 6 + 6 + 6 + 2 = 33\\
+  \end{split}
+\end{equation*}
+
+\subsection{Order Crossover}
+\begin{equation*}
+  \begin{split}
+    P_1: (1,2,\boxed{3,4,5},6,7)\\
+    P_2: (3,1,\boxed{4,2,7},6,5)
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_1: (2,7,\boxed{3,4,5},6,1)\\
+    H_1: (2,7,3,4,5,6,1) H_1: 2 \overset{6}{\rightarrow} 7 \overset{2}{\rightarrow} 3 \overset{5}{\rightarrow} 4 \overset{3}{\rightarrow} 5 \overset{6}{\rightarrow} 6 \overset{4}{\rightarrow} 1 \overset{4}{\rightarrow} 2\\
+    w(H_1) = 6 + 2 + 5 + 3 + 6 + 4 + 4 = 30\\
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_2: (3,5,\boxed{4,2,7},6,1)\\
+    H_2: (3,5,4,2,7,6,1) H_2: 3 \overset{2}{\rightarrow} 5 \overset{3}{\rightarrow} 4 \overset{4}{\rightarrow} 2 \overset{6}{\rightarrow} 7 \overset{6}{\rightarrow} 6 \overset{4}{\rightarrow} 1 \overset{4}{\rightarrow} 3\\
+    w(H_2) = 2 + 3 + 4 + 6 + 6 + 4 + 4 = 29\\
+  \end{split}
+\end{equation*}
+
+\subsection{Cycle Crossover}
+\begin{equation*}
+  \begin{split}
+    P_1: (1,2,3,4,5,6,7)\\
+    P_2: (3,1,4,2,7,6,5)
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    Cycle\ 1: 1,3,4,2\\
+    Cycle\ 2: 5,7\\
+    Cycle\ 3: 6\\
+    H_1: (1,2,3,4,7,6,5) H_1: 1 \overset{4}{\rightarrow} 2 \overset{8}{\rightarrow} 3 \overset{5}{\rightarrow} 4 \overset{3}{\rightarrow} 7 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 5 \overset{2}{\rightarrow} 1\\
+    w(H_1) = 4 + 8 + 5 + 3 + 6 + 6 + 2 = 34\\
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_2: (3,1,4,2,5,6,7) H_2: 3 \overset{4}{\rightarrow} 1 \overset{1}{\rightarrow} 4 \overset{4}{\rightarrow} 2 \overset{6}{\rightarrow} 5 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 7 \overset{2}{\rightarrow} 3\\
+    w(H_2) = 4 + 1 + 4 + 6 + 6 + 6 + 2= 29\\
+  \end{split}
+\end{equation*}
+
+\section{Mutacion}
+\subsection{Mutacion por Intercambio}
+\begin{equation*}
+  \begin{split}
+    P_1: (1,\boxed{2},3,4,5,6,\boxed{7})\\
+    P_2: (3,1,\boxed{4},\boxed{2},7,6,5)
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_1: (1,7,3,4,5,6,2) H_1: 1 \overset{2}{\rightarrow} 7 \overset{2}{\rightarrow} 3 \overset{5}{\rightarrow} 4 \overset{3}{\rightarrow} 5 \overset{6}{\rightarrow} 6 \overset{3}{\rightarrow} 2 \overset{4}{\rightarrow} 1\\
+    w(H_1) = 2 + 2 + 5 + 3 + 6 + 3 + 4 = 25\\
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_2: (3,1,2,4,7,6,5) H_2: 3 \overset{4}{\rightarrow} 1 \overset{4}{\rightarrow} 2 \overset{4}{\rightarrow} 4 \overset{3}{\rightarrow} 7 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 5 \overset{2}{\rightarrow} 3\\
+    w(H_2) = 4 + 4 + 4 + 3 + 6 + 6 + 2 = 29\\
+  \end{split}
+\end{equation*}
+
+\subsection{Mutacion por Insercion}
+\begin{equation*}
+  \begin{split}
+    P_1: (1,\boxed{2},3,4,5,6,\boxed{7})\\
+    P_2: (3,1,\boxed{4},\boxed{2},7,6,5)
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_1: (1,3,4,5,6,7,2) H_1: 1 \overset{4}{\rightarrow} 3 \overset{5}{\rightarrow} 4 \overset{3}{\rightarrow} 5 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 7 \overset{6}{\rightarrow} 2 \overset{4}{\rightarrow} 1\\
+    w(H_1) = 4 + 5 + 3 + 6 + 6 + 6 + 4 = 34\\
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_2: (3,1,2,4,7,6,5) H_2: 3 \overset{4}{\rightarrow} 1 \overset{4}{\rightarrow} 2 \overset{4}{\rightarrow} 4 \overset{3}{\rightarrow} 7 \overset{6}{\rightarrow} 6 \overset{6}{\rightarrow} 5 \overset{2}{\rightarrow} 3\\
+    w(H_2) = 4 + 4 + 4 + 3 + 6 + 6 + 2 = 29\\
+  \end{split}
+\end{equation*}
+
+\subsection{Mutacion basado en desplazamiento}
+\begin{equation*}
+  \begin{split}
+    P_1: (1,\boxed{2,3},4,5,6,7)\\
+    P_2: (3,1,4,2,7,\boxed{6,5})
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_1: (1,4,5,6,2,3,7) H_1: 1 \overset{1}{\rightarrow} 4 \overset{3}{\rightarrow} 5 \overset{6}{\rightarrow} 6 \overset{3}{\rightarrow} 2 \overset{8}{\rightarrow} 3 \overset{2}{\rightarrow} 7 \overset{2}{\rightarrow} 1\\
+    w(H_1) = 1 + 3 + 6 + 3 + 8 + 2 + 2 = 25\\
+  \end{split}
+\end{equation*}
+
+\begin{equation*}
+  \begin{split}
+    H_2: (3,6,5,1,2,4,7) H_2: 3 \overset{8}{\rightarrow} 6 \overset{6}{\rightarrow} 5 \overset{2}{\rightarrow} 1 \overset{4}{\rightarrow} 2 \overset{4}{\rightarrow} 4 \overset{3}{\rightarrow} 7 \overset{2}{\rightarrow} 3\\
+    w(H_2) = 8 + 6 + 2 + 4 + 4 + 3 + 2 = 29\\
+  \end{split}
+\end{equation*}
+\end{document}

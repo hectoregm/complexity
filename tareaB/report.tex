@@ -1,0 +1,82 @@
+
+\documentclass{article}
+\usepackage[left=2cm,right=2cm,top=3cm,bottom=3cm,letterpaper]{geometry}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage{verbatim, array}
+\usepackage{hyperref}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsthm}
+\newtheorem{theorem}{Teorema}
+
+
+\newcommand{\jimage}[2]{\includegraphics[width=#1\textwidth]{#2}\vskip10pt}
+\newcommand{\jcimage}[2]{\begin{center}\includegraphics[width=#1\textwidth]{#2}\end{center}\vskip10pt}
+
+\author{Héctor Enrique Gómez Morales}
+\title{MAX-3-CNF Satisfiability and Subset sum}
+\begin{document}
+\maketitle
+\section{MAX-3-CNF Satisfiability}
+Se tiene que un ejemplar de \texttt{3-CNF} puede ser o no satisfacible. Para que este sea satisfacible debe existir una asignación de verdad para cada variable que hace que cada cláusula evalué a 1. Si el ejemplar no es satisfacible entonces se quiere ver que tan 'cerca' esta de ser satisfacible, es decir, queremos encontrar una asignación de verdad de tal forma que se satisfagan el mayor numero de cláusulas. Este ultimo problema es llamado \texttt{MAX-3-CNF satisfability}.
+
+Se usa este problema para dar un ejemplo de la técnica de aleatorización para el diseño de algoritmos de aproximación. Se tiene que fijando cada variable a 1 con probabilidad $1/2$ y a 0 con probabilidad $1/2$ nos dan un 8/7-algoritmo de aproximación.
+
+Se asume que cada cláusula tiene exactamente tres cláusulas dado que nuestros ejemplares son de \texttt{3-CNF}, también se asume que ninguna cláusula tiene al mismo tiempo una variable y su negación.
+
+\begin{theorem}
+  Dada una instancia de \texttt{MAX-3-CNF satisfiability} con $n$ variables $x_1, x_2, ..., x_n$ y $m$ cláusulas, el algoritmo de aproximación aleatorizado que asigna independiente a cada variable el valor 1 con probabilidad $1/2$ y 0 con probabilidad $1/2$ es un 8/7-algoritmo de aproximación aleatorizado.
+\end{theorem}
+\begin{proof}
+  Supongamos que se ha asignado a cada variable el valor 1 con probabilidad $1/2$ y 0 con probabilidad $1/2$. Para cada $i = 1, 2, ..., n$ se define un variable aleatoria:
+
+  \begin{equation*}
+    Y_i = I \{ cláusula\ i\ es\ satisfecha \}
+  \end{equation*}
+
+  en donde $Y_i = 1$ mientras se tenga que al menos una de las literales de la $i$-esima cláusula tiene asignado un 1. Como ninguna literal aparece mas de una vez en una misma cláusula y también suponemos que no hay una variables y su negación en una misma cláusula entonces la asignación de las tres literales en cada cláusula son independientes. Así tenemos que una cláusula no es satisfacible solo si las tres literales se les asigna 0. Por lo que Pr\{cláusula i es no satisfacible\} $= (1/2)^3 = 1/8 $. por lo que Pr\{cláusula i es satisfacible\} $= 1 - 1/8 = 7/8$. Se tiene por un resultado conocido que entonces que la esperanza $E[Y_i] = 7/8$. Definiendo a $Y$ como el numero de cláusulas satisfechas, tenemos que $Y = Y_1 + Y_2 + ... + Y_m$. Así:
+
+  \begin{eqnarray}
+      E[Y] = E[\sum_{i=1}^{m} Y_i] \\
+      = \sum_{i=1}^{m} E[Y_i] \\
+      = \sum_{i=1}^{m} 7/8
+      = 7m/8
+  \end{eqnarray}
+Claramente, m es la cota superior para el numero de cláusulas satisfacibles para un ejemplar por lo que se tiene que la razón de aproximación es de a lo mas 8/7
+\end{proof}
+
+Las partes mas importantes de la demostración son como se hace el reemplazo que en general es bastante intuitivo pero que tienen su chiste tanto el fijar el deadline de cada tarea en $B + 1$ y fijar la duración igual al entero que era el peso del elemento en $a$, al hacer esto es que se tiene la conexión entre los ejemplares. Finalmente el definir una tarea ejecutora para provocar una partición de las tareas acaba por resolver la demostración.
+
+\section{Subset Sum}
+Un ejemplar de \texttt{Subset Sum} es una tupla $(S, t)$ donde $S$ es un conjunto $\{ x_1, x_2, ..., x_n\}$ de números enteros positivos y con $t$ un numero entero positivo. Este problema de decisión pregunta si existe un subconjunto S tal que la suma de los elementos de ese subconjunto sea exactamente el valor objetivo $t$. Se tiene que este problema esta en \verb;NP-C;. Se tiene que primero se define un algoritmo que calcula la solución exacta pero este algoritmo toma un tiempo exponencial. La implementación a grandes rasgos seria por medio un procedimiento iterativo que en cada iteración $i$, se calcula la suma de todos los subconjuntos del tipo $\{ x_1, x_2, ..., x_i\}$ usando como punto de partida las sumas de los subconjuntos $\{ x_1, x_2, ..., x_{i-1}\}$. Al ir realizando este procedimiento veríamos que cuando la suma de un subconjunto $S'$ excede el valor $t$ no tiene sentido mantenerlo puesto que ningún conjunto que contenga a $S'$ puede ser una solución optima.
+
+Para obtener un algoritmo de aproximación polinomial, se observa que si se corta cada lista $L_i$, que es la lista de las sumas de todos los subconjuntos de $\{ x_1, ..., x_i\}$ que no exceden del valor $t$. La idea es que si dos valores en $L$ son muy cercanos entonces dado que estamos buscando una solución aproximada no tiene sentido mantener ambas sumas explícitamente. Así al reducir la lista L por $\delta$ significa remover tantos elementos de L como sea posible, de tal forma que si $L'$ es el resultado de reducir $L$ entonces cada elemento $y$ que fue removido de $L$ entonces hay un elemento $z$ the aproxima a y:
+
+  \begin{equation*}
+    \frac{y}{1 + \delta} \leq z \leq y
+  \end{equation*}
+
+  Se puede pensar en $z$ como un representante de $y$ en la nueva lista $L'$. Este procedimiento se puede hacer en tiempo de ejecución lineal. A este procedimiento se le llama \texttt{Trim}, que toma una lista y una $\delta$ y regresa una nueva lista $L'$ reducida teniendo como representantes a elementos de la lista original $L$. Usando el procedimiento \texttt{Trim} se construye una aproximación en el cual se sigue la misma estructura del algoritmo de tiempo exponencial descrito anteriormente pero ahora se hace uso del procedimiento \texttt{Trim} para reducir las listas $L_i$. Esta aproximación toma también un parámetro de aproximación $\epsilon$ el cual esta en el rango $(0,1)$ y esta aproximación nos regresa un valor $z$ que esta a un factor $1 + \epsilon$ de la solución optima. Dado que queremos demostrar que el esquema de aproximación anterior is completamente polinomial con respecto a $1 + \epsilon$ y al tamaño de la entrada la demostración de esto es mucho mas complicada. Primeramente es necesario demostrar que:
+  
+  \begin{equation*}
+    \frac{y^{*}}{z^{*}} \leq 1 + \epsilon
+  \end{equation*}
+  
+Donde $y^{*}$ denota la solución optima del problema, así por medio de una sucesión de desigualdades se obtiene que:
+
+  \begin{equation*}
+    \frac{y^{*}}{z^{*}} \leq (1 + \frac{\epsilon}{2n})^n \leq 1 + \epsilon         \end{equation*}
+    
+Para acabar la demostración se tiene observa que elementos sucesivos $z$ y $z'$ de $L_i$ después de hacer el llamado a \texttt{Trim} deben the diferir a lo mas en un factor de $1 + \epsilon / 2n$. Dado que cada lista contiene el valor 0, posiblemente el valor 1 y hasta $\left \lfloor 1 + \epsilon / 2n \right \rfloor$ valores adicionales dado lo anterior. Por lo que el numero de elementos para cada lista $L_i$ es a lo mas:
+
+  \begin{eqnarray}
+    log_{1 + \epsilon/2n} t + 2 = \frac{ln t}{ln(1 + \epsilon/2n)} + 2\\
+    \leq \frac{4n lnt}{\epsilon} + 2
+  \end{eqnarray}
+
+entonces tenemos una cota que es polinomial con respecto al tamaño de la entrada , que es numero de bits $ln t$ donde t representa el numero de bits para representar el conjunto $S$, que a su vez es polinomial con respecto a $n$ y a $1/\epsilon$. Dado que el algoritmo es polinomial para los tamaños de $L_i$ entonces se tiene que es algoritmo de aproximación polinomio completo
+\end{document}
