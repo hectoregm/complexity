@@ -20,8 +20,6 @@ def create_coordinates(order, grid_size):
 def generate_tsp_graph(order, grid_size):
     coords = create_coordinates(order, grid_size)
 
-    print coords
-
     graph = {}
     weighs = {}
     vertices = range(1, order + 1)

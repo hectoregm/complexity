@@ -3,6 +3,7 @@ import random
 import math
 from copy import copy
 from operator import methodcaller
+import approx_algorithms as ap
 
 def get_values(n, blacklist, array):
     count = 0
@@ -17,6 +18,18 @@ def get_values(n, blacklist, array):
             result.append(array[index])
             index += 1
             count += 1
+
+    return result
+
+def get_values_order(index, blacklist, array):
+    result = []
+
+    length = len(array)
+
+    for idx in range(length):
+        rindex = (index + idx) % length
+        if not array[rindex] in blacklist:
+            result.append(array[rindex])
 
     return result
 
@@ -37,7 +50,11 @@ class GeneticIndividual(object):
             else:
                 dst_city = self.tour[idx+1]
 
-            total += self.weighs[(orig_city, dst_city)]
+            weigh = self.weighs.get((orig_city, dst_city), False)
+            if weigh:
+                total += self.weighs[(orig_city, dst_city)]
+            else:
+                total += self.weighs[(dst_city, orig_city)]
 
         return total
 
@@ -87,8 +104,8 @@ class GeneticIndividual(object):
             submatch_a = self.tour[index:index + msize]
             submatch_b = other.tour[index:index + msize]
 
-            new_tour_one = [0] * 8
-            new_tour_two = [0] * 8
+            new_tour_one = [0] * self.size
+            new_tour_two = [0] * self.size
 
             blacklist_one = copy(submatch_a)
             for idx in range(self.size):
@@ -118,16 +135,33 @@ class GeneticIndividual(object):
                     if new_tour_two[idx] == 0:
                         new_tour_two[idx] = missing[count]
                         count += 1
+        elif cross_type == "order":
+            msize = 3
+            index = random.randrange(self.size-msize+1)
+            submatch_a = self.tour[index:index + msize]
+            submatch_b = other.tour[index:index + msize]
 
-            # print "Partial"
-            # print self.tour
-            # print other.tour
-            # print submatch_a
-            # print submatch_b
-            # print new_tour_one
-            # print new_tour_two
-            # print missing
-                
+            new_tour_one = [0] * self.size
+            new_tour_two = [0] * self.size
+            
+            new_tour_one[index:index + msize] = submatch_a
+            new_tour_two[index:index + msize] = submatch_b
+
+            missing = get_values_order(index, submatch_a, other.tour)
+            count = 0
+            if len(missing) > 0:
+                for idx in range(self.size):
+                    if new_tour_one[idx] == 0:
+                        new_tour_one[idx] = missing[count]
+                        count += 1
+
+            missing = get_values_order(index, submatch_b, self.tour)
+            count = 0
+            if len(missing) > 0:
+                for idx in range(self.size):
+                    if new_tour_two[idx] == 0:
+                        new_tour_two[idx] = missing[count]
+                        count += 1
 
         return (GeneticIndividual(self.cities, self.weighs, new_tour_one),
                 GeneticIndividual(self.cities, self.weighs, new_tour_two))
@@ -157,7 +191,7 @@ class GeneticIndividual(object):
                 self.tour[index_b:1] = subpath
 
     def __str__(self):
-        return str(self.tour)
+        return str(self.tour) + " cost: " + str(self.fitness())
 
     @classmethod
     def random(cls, cities, weighs):
@@ -212,7 +246,10 @@ class GeneticPopulation(object):
     def select(self):
         return self.population[random.randrange(self.size)]
 
-    def reproduce(self, cross_type="partial"):
+    def elite(self):
+        return sorted(self.population, key=methodcaller('fitness'))[0]
+
+    def reproduce(self, cross_type="one_point", mutation_type="swap"):
         children = []
         for _ in range(self.size):
             parent_a = self.select()
@@ -236,27 +273,40 @@ class GeneticPopulation(object):
 
 class GeneticTSP(object):
 
-    def __init__(self, graph, weighs, population=20, generations=50):
+    def __init__(self, graph, weighs, population=25, generations=2000):
         self.graph = graph
         self.weighs = weighs
         self.psize = population
         self.generations = generations
+        self.selection_strategies = ["natural", "weight", "random"]
+        self.cross_strategies = ["one_point", "partial", "order"]
+        self.mutation_strategies = ["swap", "insertion", "shift"]
 
         self.population = GeneticPopulation(self.graph, self.weighs, self.psize)
-        print self.population
+        #print self.population
+
+    def select_strategies(self):
+        selection = self.selection_strategies[random.randrange(3)]
+        cross = self.cross_strategies[random.randrange(3)]
+        mutation = self.mutation_strategies[random.randrange(3)]
+
+        return (selection, cross, mutation)
 
     def solve(self):
         print "Solving"
 
         for idx in range(self.generations):
-            print "Generation %d:" % idx
-            selection = self.population.selection(5, "random")
-            children = selection.reproduce()
+            selection_strategy, cross_strategy, mutation_strategy = self.select_strategies()
+            #print "Generation %d, using %s, %s, %s" % (idx, selection_strategy, cross_strategy, mutation_strategy)
+
+            selection = self.population.selection(5, selection_strategy)
+            children = selection.reproduce(cross_strategy, mutation_strategy)
             self.population.population += children
 
-            self.population = self.population.selection(self.psize, "random")
+            self.population = self.population.selection(self.psize, selection_strategy)
 
-            print self.population
+
+        print self.population.elite()
 
     def __str__(self):
         result = "Possible solutions (Tours):\n"
@@ -266,8 +316,8 @@ class GeneticTSP(object):
         
 
 if __name__ == "__main__":
-    #import tsp_graph
-    #graph, weighs = tsp_graph.generate_tsp_graph(5, 20)
+    import tsp_graph
+    graph, weighs = tsp_graph.generate_tsp_graph(50, 200)
     #print graph
     #print weighs
 
@@ -281,17 +331,36 @@ if __name__ == "__main__":
            "h" : ["a", "b", "c", "d", "e", "f", "g"]
     }
 
+    # # Example graph from Cormen (page 1029)
+    # g2_weighs = {
+    #     ("a", "b"): 2, ("a", "c"): 3.16, ("a", "d"): 2, ("a", "e"): 3.16, ("a", "f"): 2.82, ("a", "g"): 4.47, ("a", "h"): 4.12,
+    #     ("b", "a"): 2, ("b", "c"): 1.41, ("b", "d"): 2.82, ("b", "e"): 3.16, ("b", "f"): 2, ("b", "g"): 4, ("b", "h"): 2.23,
+    #     ("c", "a"): 3.16, ("c", "b"): 1.41, ("c", "d"): 4.24, ("c", "e"): 4.47, ("c", "f"): 3.16, ("c", "g"): 5.09, ("c", "h"): 2.23,
+    #     ("d", "a"): 2, ("d", "b"): 2.82, ("d", "c"): 4.24, ("d", "e"): 1.41, ("d", "f"): 2, ("d", "g"): 2.82, ("d", "h"): 4.12,
+    #     ("e", "a"): 3.16, ("e", "b"): 3.16, ("e", "c"): 4.47, ("e", "d"): 1.41, ("e", "f"): 1.41, ("e", "g"): 1.41, ("e", "h"): 3.60,
+    #     ("f", "a"): 2.82, ("f", "b"): 2, ("f", "c"): 3.16, ("f", "d"): 2, ("f", "e"): 1.41, ("f", "g"): 2, ("f", "h"): 2.23,
+    #     ("g", "a"): 4.47, ("g", "b"): 4, ("g", "c"): 5.09, ("g", "d"): 2.82, ("g", "e"): 1.41, ("g", "f"): 2, ("g", "h"): 3.60,
+    #     ("h", "a"): 4.12, ("h", "b"): 2.23, ("h", "c"): 2.23, ("h", "d"): 4.12, ("h", "e"): 3.60, ("h", "f"): 2.23, ("h", "g"): 3.60
+    # }
+
     # Example graph from Cormen (page 1029)
     g2_weighs = {
         ("a", "b"): 2, ("a", "c"): 3.16, ("a", "d"): 2, ("a", "e"): 3.16, ("a", "f"): 2.82, ("a", "g"): 4.47, ("a", "h"): 4.12,
-        ("b", "a"): 2, ("b", "c"): 1.41, ("b", "d"): 2.82, ("b", "e"): 3.16, ("b", "f"): 2, ("b", "g"): 4, ("b", "h"): 2.23,
-        ("c", "a"): 3.16, ("c", "b"): 1.41, ("c", "d"): 4.24, ("c", "e"): 4.47, ("c", "f"): 3.16, ("c", "g"): 5.09, ("c", "h"): 2.23,
-        ("d", "a"): 2, ("d", "b"): 2.82, ("d", "c"): 4.24, ("d", "e"): 1.41, ("d", "f"): 2, ("d", "g"): 2.82, ("d", "h"): 4.12,
-        ("e", "a"): 3.16, ("e", "b"): 3.16, ("e", "c"): 4.47, ("e", "d"): 1.41, ("e", "f"): 1.41, ("e", "g"): 1.41, ("e", "h"): 3.60,
-        ("f", "a"): 2.82, ("f", "b"): 2, ("f", "c"): 3.16, ("f", "d"): 2, ("f", "e"): 1.41, ("f", "g"): 2, ("f", "h"): 2.23,
-        ("g", "a"): 4.47, ("g", "b"): 4, ("g", "c"): 5.09, ("g", "d"): 2.82, ("g", "e"): 1.41, ("g", "f"): 2, ("g", "h"): 3.60,
-        ("h", "a"): 4.12, ("h", "b"): 2.23, ("h", "c"): 2.23, ("h", "d"): 4.12, ("h", "e"): 3.60, ("h", "f"): 2.23, ("h", "g"): 3.60
+        ("b", "c"): 1.41, ("b", "d"): 2.82, ("b", "e"): 3.16, ("b", "f"): 2, ("b", "g"): 4, ("b", "h"): 2.23,
+        ("c", "d"): 4.24, ("c", "e"): 4.47, ("c", "f"): 3.16, ("c", "g"): 5.09, ("c", "h"): 2.23,
+        ("d", "e"): 1.41, ("d", "f"): 2, ("d", "g"): 2.82, ("d", "h"): 4.12,
+        ("e", "f"): 1.41, ("e", "g"): 1.41, ("e", "h"): 3.60,
+        ("f", "g"): 2, ("f", "h"): 2.23,
+        ("g", "h"): 3.60
     }
     
-    tsp_solver = GeneticTSP(g2, g2_weighs)
+    #tsp_solver = GeneticTSP(g2, g2_weighs)
+    #tsp_solver.solve()
+    tsp_solver = GeneticTSP(graph, weighs)
     tsp_solver.solve()
+
+    g1 = ap.Graph(graph)
+
+    tour = g1.approx_tsp_tour(weighs)
+    print "Approx TSP tour: %s" % tour
+    print "Cost using approximation algorithm: %s" % GeneticIndividual(graph.keys(), weighs, tour).fitness()

@@ -19,15 +19,14 @@ class Node(object):
         self.children.append(node)
 
     def __str__(self):
-        return self.label
+        return str(self.label)
 
-    def preorder(self):
-        array = []
-        array.append(self.label)
+    def preorder(self, accumulator):
+        accumulator.append(self.label)
+        
         for child in self.children:
-            array += child.preorder()
-
-        return array
+            if not child.label in accumulator:
+                child.preorder(accumulator)
 
 class Vertex(object):
     """
@@ -215,7 +214,7 @@ class Graph(object):
             A list with the near-optimal tour for the given graph
         """
         # Calculate the MST for the graph
-        mst = self.kruskal(weighs)
+        mst = sorted(self.kruskal(weighs))
 
         # Initialize tour
         tour = []
@@ -228,17 +227,18 @@ class Graph(object):
         # From the edges of the MST create the corresponding tree.
         for edge in mst:
             (vertex_u, vertex_v) = edge
+
             parent = nodes[vertex_u]
             child = nodes[vertex_v]
             parent.add_child(child)
-
-        root = nodes[self.vertices()[-1]]
-        # Get the root of the tree
-        while(root.parent != None):
-            root = root.parent
+            child.add_child(parent)
+                
+        root = nodes[self.vertices()[0]]
 
         # Get the preorder walk of the tree, that is our tour
-        return root.preorder()
+        result = []
+        root.preorder(result)
+        return result
 
 if __name__ == "__main__":
     # Example graph from Cormen (page 1025)
