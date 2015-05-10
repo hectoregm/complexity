@@ -78,9 +78,6 @@ class GeneticIndividual(object):
                 for idx in range(len(gaps)):
                     new_tour_one[gaps[idx]] = values[idx]
 
-            #print "Crossover"
-            #print new_tour_one
-                    
             new_tour_two = other.tour[0:cutpoint] + self.tour[cutpoint:]
 
             cities = {}
@@ -283,7 +280,6 @@ class GeneticTSP(object):
         self.mutation_strategies = ["swap", "insertion", "shift"]
 
         self.population = GeneticPopulation(self.graph, self.weighs, self.psize)
-        #print self.population
 
     def select_strategies(self):
         selection = self.selection_strategies[random.randrange(3)]
