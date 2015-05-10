@@ -1,0 +1,17 @@
+El script principal es genetic_tsp.py, se corre haciendo:
+
+python genetic_tsp.py
+
+Se tiene la función generate_tsp_graph(orden, dim)
+en donde el orden es el numero de ciudades en el ejemplar TSP y dim es el tamaño de la dimensión de la rejilla donde están las ciudades.
+
+Se tiene por default una población de 20 individuos teniendose 500 iteraciones/generaciones. Pero estos dos parámetros son configurables
+
+Con estos parámetros se logra obtener la ruta optima para el ejemplo que se tiene en el cormen para TSP.
+
+Para el ejemplar con n=50 se tiene que por lo general usando una población de 25 candidatos y 2000 iteraciones se tiene soluciones en general mejores que el algoritmo de aproximación pero con un costo computacional mas grande.
+
+Para el ejemplar con n=79 se tiene que por lo general usando una población de 45 candidatos y 4000 iteraciones se tiene soluciones muy cercanas a la solución dada por el algoritmo de aproximación pero en general es mucho mas rápido y mas optimo este.
+
+Para el ejemplar con n=100 se tiene lo mismo que con n=70
+por lo que se puede concluir que el algoritmo genético tiene la ventaja de poder darte una mejor solución pero con un mayor uso de tiempo de ejecución mientras que la aproximación da una solución bastante buena en un tiempo polinomial deterministico aparte de ser una solución estable es decir se obtiene la misma solución (buena o mala) mientras que la solución del algoritmo genético puede varias aun sin cambiar los parámetros de entrada.

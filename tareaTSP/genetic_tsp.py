@@ -58,7 +58,7 @@ class GeneticIndividual(object):
 
         return total
 
-    def crossover(self, other, cross_type="partial"):
+    def crossover(self, other, cross_type="one_point"):
         if cross_type == "one_point":
             cutpoint = random.randrange(self.size)
             new_tour_one = self.tour[0:cutpoint] + other.tour[cutpoint:]
@@ -253,8 +253,10 @@ class GeneticPopulation(object):
             parent_b = self.select()
 
             child_a, child_b = parent_a.crossover(parent_b, cross_type)
+
             child_a.mutate()
             child_b.mutate()
+
             children.append(child_a)
             children.append(child_b)
 
@@ -270,7 +272,7 @@ class GeneticPopulation(object):
 
 class GeneticTSP(object):
 
-    def __init__(self, graph, weighs, population=25, generations=500):
+    def __init__(self, graph, weighs, population=20, generations=500):
         self.graph = graph
         self.weighs = weighs
         self.psize = population
@@ -295,7 +297,8 @@ class GeneticTSP(object):
             selection_strategy, cross_strategy, mutation_strategy = self.select_strategies()
             #print "Generation %d, using %s, %s, %s" % (idx, selection_strategy, cross_strategy, mutation_strategy)
 
-            selection = self.population.selection(5, selection_strategy)
+            selection_size = int(self.psize / 2.0)
+            selection = self.population.selection(selection_size, selection_strategy)
             children = selection.reproduce(cross_strategy, mutation_strategy)
             self.population.population += children
 
@@ -355,11 +358,21 @@ if __name__ == "__main__":
 
     tour = graph_approx.approx_tsp_tour(weighs)
     print "Approx TSP tour: %s cost: %s" % (tour, GeneticIndividual(graph.keys(), weighs, tour).fitness())
-
     print "\nTSP instance, order = 70, poblation = 35, generations = 4000"
     graph, weighs = tsp_graph.generate_tsp_graph(70, 200)
     
     tsp_solver = GeneticTSP(graph, weighs, 35, 4000)
+    tsp_solver.solve()
+
+    graph_approx = ap.Graph(graph)
+
+    tour = graph_approx.approx_tsp_tour(weighs)
+    print "Approx TSP tour: %s cost: %s" % (tour, GeneticIndividual(graph.keys(), weighs, tour).fitness())
+
+    print "\nTSP instance, order = 100, poblation = 45, generations = 5000"
+    graph, weighs = tsp_graph.generate_tsp_graph(100, 500)
+    
+    tsp_solver = GeneticTSP(graph, weighs, 45, 5000)
     tsp_solver.solve()
 
     graph_approx = ap.Graph(graph)
