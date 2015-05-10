@@ -1,7 +1,8 @@
 from random import randrange
 import random
+import math
 from copy import copy
-from operator import itemgetter, attrgetter, methodcaller
+from operator import methodcaller
 
 class GeneticIndividual(object):
 
@@ -35,6 +36,9 @@ class GeneticIndividual(object):
 class GeneticPopulation(object):
 
     def __init__(self, graph, weighs, population_size, generate=True):
+        self.graph = graph
+        self.weighs = weighs
+        self.size = population_size
         self.population = []
         self.cities = graph.keys()
 
@@ -42,8 +46,34 @@ class GeneticPopulation(object):
             for individual in range(0, population_size):
                 self.population.append(GeneticIndividual.random(self.cities, weighs))
 
-    def selection(size, selection_type="natural"):
-        pass #for idx in range(size):
+    def selection(self, size, selection_type="natural"):
+        self.population = sorted(self.population, key=methodcaller('fitness'))
+
+        if selection_type == "natural":
+            selection = GeneticPopulation(self.graph, self.weighs, self.size, False)
+            selection.population = self.population[0:size]
+        elif selection_type == "weight":
+            num_elites = int(math.floor(size * 0.80))
+            elites = self.population[0:num_elites]
+            tails = self.population[:(num_elites-(size+1)):-1]
+
+            selection = GeneticPopulation(self.graph, self.weighs, self.size, False)
+            selection.population = elites + tails
+        elif selection_type == "random":
+            num_elites = int(math.floor(size * 0.50))
+            winners = self.population[0:num_elites]
+
+            while len(winners) < size:
+                winner = self.population[random.randrange(self.size)]
+                if not winner in winners:
+                    winners.append(winner)
+                else:
+                    continue
+
+            selection = GeneticPopulation(self.graph, self.weighs, self.size, False)
+            selection.population = winners
+
+        return selection
 
     def __str__(self):
         result = ""
@@ -62,9 +92,12 @@ class GeneticTSP(object):
         self.generations = generations
 
         self.population = GeneticPopulation(self.graph, self.weighs, self.psize)
+        print self.population
 
     def solve(self):
-        return []
+        print "Solving"
+        selection = self.population.selection(5, "random")
+        print selection
 
     def __str__(self):
         result = "Possible solutions (Tours):\n"
@@ -102,4 +135,4 @@ if __name__ == "__main__":
     }
     
     tsp_solver = GeneticTSP(g2, g2_weighs)
-    print tsp_solver
+    tsp_solver.solve()
