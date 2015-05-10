@@ -273,7 +273,7 @@ class GeneticPopulation(object):
 
 class GeneticTSP(object):
 
-    def __init__(self, graph, weighs, population=25, generations=2000):
+    def __init__(self, graph, weighs, population=25, generations=500):
         self.graph = graph
         self.weighs = weighs
         self.psize = population
@@ -293,7 +293,7 @@ class GeneticTSP(object):
         return (selection, cross, mutation)
 
     def solve(self):
-        print "Solving"
+        print "Solving..."
 
         for idx in range(self.generations):
             selection_strategy, cross_strategy, mutation_strategy = self.select_strategies()
@@ -306,6 +306,7 @@ class GeneticTSP(object):
             self.population = self.population.selection(self.psize, selection_strategy)
 
 
+        print "Best solution found (GA)"
         print self.population.elite()
 
     def __str__(self):
@@ -317,11 +318,8 @@ class GeneticTSP(object):
 
 if __name__ == "__main__":
     import tsp_graph
-    graph, weighs = tsp_graph.generate_tsp_graph(50, 200)
-    #print graph
-    #print weighs
 
-    g2 = { "a" : ["b", "c", "d", "e", "f", "g", "h"],
+    cormen_graph = { "a" : ["b", "c", "d", "e", "f", "g", "h"],
            "b" : ["a", "c", "d", "e", "f", "g", "h"],
            "c" : ["a", "b", "d", "e", "f", "g", "h"],
            "d" : ["a", "b", "c", "e", "f", "g", "h"],
@@ -331,20 +329,8 @@ if __name__ == "__main__":
            "h" : ["a", "b", "c", "d", "e", "f", "g"]
     }
 
-    # # Example graph from Cormen (page 1029)
-    # g2_weighs = {
-    #     ("a", "b"): 2, ("a", "c"): 3.16, ("a", "d"): 2, ("a", "e"): 3.16, ("a", "f"): 2.82, ("a", "g"): 4.47, ("a", "h"): 4.12,
-    #     ("b", "a"): 2, ("b", "c"): 1.41, ("b", "d"): 2.82, ("b", "e"): 3.16, ("b", "f"): 2, ("b", "g"): 4, ("b", "h"): 2.23,
-    #     ("c", "a"): 3.16, ("c", "b"): 1.41, ("c", "d"): 4.24, ("c", "e"): 4.47, ("c", "f"): 3.16, ("c", "g"): 5.09, ("c", "h"): 2.23,
-    #     ("d", "a"): 2, ("d", "b"): 2.82, ("d", "c"): 4.24, ("d", "e"): 1.41, ("d", "f"): 2, ("d", "g"): 2.82, ("d", "h"): 4.12,
-    #     ("e", "a"): 3.16, ("e", "b"): 3.16, ("e", "c"): 4.47, ("e", "d"): 1.41, ("e", "f"): 1.41, ("e", "g"): 1.41, ("e", "h"): 3.60,
-    #     ("f", "a"): 2.82, ("f", "b"): 2, ("f", "c"): 3.16, ("f", "d"): 2, ("f", "e"): 1.41, ("f", "g"): 2, ("f", "h"): 2.23,
-    #     ("g", "a"): 4.47, ("g", "b"): 4, ("g", "c"): 5.09, ("g", "d"): 2.82, ("g", "e"): 1.41, ("g", "f"): 2, ("g", "h"): 3.60,
-    #     ("h", "a"): 4.12, ("h", "b"): 2.23, ("h", "c"): 2.23, ("h", "d"): 4.12, ("h", "e"): 3.60, ("h", "f"): 2.23, ("h", "g"): 3.60
-    # }
-
     # Example graph from Cormen (page 1029)
-    g2_weighs = {
+    cormen_weighs = {
         ("a", "b"): 2, ("a", "c"): 3.16, ("a", "d"): 2, ("a", "e"): 3.16, ("a", "f"): 2.82, ("a", "g"): 4.47, ("a", "h"): 4.12,
         ("b", "c"): 1.41, ("b", "d"): 2.82, ("b", "e"): 3.16, ("b", "f"): 2, ("b", "g"): 4, ("b", "h"): 2.23,
         ("c", "d"): 4.24, ("c", "e"): 4.47, ("c", "f"): 3.16, ("c", "g"): 5.09, ("c", "h"): 2.23,
@@ -353,14 +339,34 @@ if __name__ == "__main__":
         ("f", "g"): 2, ("f", "h"): 2.23,
         ("g", "h"): 3.60
     }
-    
-    #tsp_solver = GeneticTSP(g2, g2_weighs)
-    #tsp_solver.solve()
-    tsp_solver = GeneticTSP(graph, weighs)
+
+    print "Cormen TSP Example"
+    tsp_solver = GeneticTSP(cormen_graph, cormen_weighs, 20)
     tsp_solver.solve()
 
-    g1 = ap.Graph(graph)
+    graph_approx = ap.Graph(cormen_graph)
 
-    tour = g1.approx_tsp_tour(weighs)
-    print "Approx TSP tour: %s" % tour
-    print "Cost using approximation algorithm: %s" % GeneticIndividual(graph.keys(), weighs, tour).fitness()
+    tour = graph_approx.approx_tsp_tour(cormen_weighs)
+    print "Approx TSP tour: %s cost: %s" % (tour, GeneticIndividual(cormen_graph.keys(), cormen_weighs, tour).fitness())
+
+    print "\nTSP instance, order = 50, poblation = 25, generations = 2000"
+    graph, weighs = tsp_graph.generate_tsp_graph(50, 200)
+    
+    tsp_solver = GeneticTSP(graph, weighs, 25, 2000)
+    tsp_solver.solve()
+
+    graph_approx = ap.Graph(graph)
+
+    tour = graph_approx.approx_tsp_tour(weighs)
+    print "Approx TSP tour: %s cost: %s" % (tour, GeneticIndividual(graph.keys(), weighs, tour).fitness())
+
+    print "\nTSP instance, order = 70, poblation = 35, generations = 4000"
+    graph, weighs = tsp_graph.generate_tsp_graph(70, 200)
+    
+    tsp_solver = GeneticTSP(graph, weighs, 35, 4000)
+    tsp_solver.solve()
+
+    graph_approx = ap.Graph(graph)
+
+    tour = graph_approx.approx_tsp_tour(weighs)
+    print "Approx TSP tour: %s cost: %s" % (tour, GeneticIndividual(graph.keys(), weighs, tour).fitness())
