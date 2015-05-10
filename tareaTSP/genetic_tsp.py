@@ -41,10 +41,9 @@ class GeneticIndividual(object):
 
         return total
 
-    def crossover(self, other, cross_type="one_point"):
-        cutpoint = random.randrange(self.size)
-
+    def crossover(self, other, cross_type="partial"):
         if cross_type == "one_point":
+            cutpoint = random.randrange(self.size)
             new_tour_one = self.tour[0:cutpoint] + other.tour[cutpoint:]
 
             cities = {}
@@ -81,6 +80,54 @@ class GeneticIndividual(object):
                 values = get_values(len(gaps), cities.keys(), self.tour)
                 for idx in range(len(gaps)):
                     new_tour_two[gaps[idx]] = values[idx]
+
+        elif cross_type == "partial":
+            msize = 3
+            index = random.randrange(self.size-msize+1)
+            submatch_a = self.tour[index:index + msize]
+            submatch_b = other.tour[index:index + msize]
+
+            new_tour_one = [0] * 8
+            new_tour_two = [0] * 8
+
+            blacklist_one = copy(submatch_a)
+            for idx in range(self.size):
+                if ((idx < index) or idx >= (index + msize)) and not other.tour[idx] in submatch_a:
+                    new_tour_one[idx] = other.tour[idx]
+
+            blacklist_two = copy(submatch_b)
+            for idx in range(self.size):
+                if ((idx < index) or idx >= (index + msize)) and not self.tour[idx] in submatch_b:
+                    new_tour_two[idx] = self.tour[idx]
+            
+            new_tour_one[index:index + msize] = submatch_a
+            new_tour_two[index:index + msize] = submatch_b
+
+            missing = [node for node in submatch_b if not node in new_tour_one]
+            count = 0
+            if len(missing) > 0:
+                for idx in range(self.size):
+                    if new_tour_one[idx] == 0:
+                        new_tour_one[idx] = missing[count]
+                        count += 1
+
+            missing = [node for node in submatch_a if not node in new_tour_two]
+            count = 0
+            if len(missing) > 0:
+                for idx in range(self.size):
+                    if new_tour_two[idx] == 0:
+                        new_tour_two[idx] = missing[count]
+                        count += 1
+
+            # print "Partial"
+            # print self.tour
+            # print other.tour
+            # print submatch_a
+            # print submatch_b
+            # print new_tour_one
+            # print new_tour_two
+            # print missing
+                
 
         return (GeneticIndividual(self.cities, self.weighs, new_tour_one),
                 GeneticIndividual(self.cities, self.weighs, new_tour_two))
@@ -165,18 +212,17 @@ class GeneticPopulation(object):
     def select(self):
         return self.population[random.randrange(self.size)]
 
-    def reproduce(self, cross_type="one_point"):
+    def reproduce(self, cross_type="partial"):
         children = []
-        if cross_type == "one_point":
-            for _ in range(self.size):
-                parent_a = self.select()
-                parent_b = self.select()
+        for _ in range(self.size):
+            parent_a = self.select()
+            parent_b = self.select()
 
-                child_a, child_b = parent_a.crossover(parent_b, cross_type)
-                child_a.mutate()
-                child_b.mutate()
-                children.append(child_a)
-                children.append(child_b)
+            child_a, child_b = parent_a.crossover(parent_b, cross_type)
+            child_a.mutate()
+            child_b.mutate()
+            children.append(child_a)
+            children.append(child_b)
 
         return children
 
