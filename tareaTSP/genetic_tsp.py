@@ -4,6 +4,22 @@ import math
 from copy import copy
 from operator import methodcaller
 
+def get_values(n, blacklist, array):
+    count = 0
+    index = 0
+    result = []
+
+    while count < n:
+        if array[index] in blacklist:
+            index += 1
+            continue
+        else:
+            result.append(array[index])
+            index += 1
+            count += 1
+
+    return result
+
 class GeneticIndividual(object):
 
     def __init__(self, cities, weighs, tour):
@@ -24,6 +40,58 @@ class GeneticIndividual(object):
             total += self.weighs[(orig_city, dst_city)]
 
         return total
+
+    def crossover(self, other, cross_type="one_point"):
+        cutpoint = random.randrange(self.size)
+
+        if cross_type == "one_point":
+            new_tour_one = self.tour[0:cutpoint] + other.tour[cutpoint:]
+
+            cities = {}
+            gaps = []
+            repeated_cities = []
+            for idx in range(self.size):
+                if cities.get(new_tour_one[idx], False):
+                    gaps.append(idx)
+                    repeated_cities.append(new_tour_one[idx])
+                else:
+                    cities[new_tour_one[idx]] = 1
+
+            if len(gaps) > 0:
+                values = get_values(len(gaps), cities.keys(), other.tour)
+                for idx in range(len(gaps)):
+                    new_tour_one[gaps[idx]] = values[idx]
+
+            #print "Crossover"
+            #print new_tour_one
+                    
+            new_tour_two = other.tour[0:cutpoint] + self.tour[cutpoint:]
+
+            cities = {}
+            gaps = []
+            repeated_cities = []
+            for idx in range(self.size):
+                if cities.get(new_tour_two[idx], False):
+                    gaps.append(idx)
+                    repeated_cities.append(new_tour_two[idx])
+                else:
+                    cities[new_tour_two[idx]] = 1
+
+            if len(gaps) > 0:
+                values = get_values(len(gaps), cities.keys(), self.tour)
+                for idx in range(len(gaps)):
+                    new_tour_two[gaps[idx]] = values[idx]
+
+        return (GeneticIndividual(self.cities, self.weighs, new_tour_one),
+                GeneticIndividual(self.cities, self.weighs, new_tour_two))
+
+    def mutate(self, mutation_type="swap"):
+        if mutation_type == "swap":
+            index_a = random.randrange(self.size)
+            index_b = random.randrange(self.size)
+            temp = self.tour[index_b]
+            self.tour[index_b] = self.tour[index_a]
+            self.tour[index_a] = temp
 
     @classmethod
     def random(cls, cities, weighs):
@@ -50,14 +118,14 @@ class GeneticPopulation(object):
         self.population = sorted(self.population, key=methodcaller('fitness'))
 
         if selection_type == "natural":
-            selection = GeneticPopulation(self.graph, self.weighs, self.size, False)
+            selection = GeneticPopulation(self.graph, self.weighs, size, False)
             selection.population = self.population[0:size]
         elif selection_type == "weight":
             num_elites = int(math.floor(size * 0.80))
             elites = self.population[0:num_elites]
             tails = self.population[:(num_elites-(size+1)):-1]
 
-            selection = GeneticPopulation(self.graph, self.weighs, self.size, False)
+            selection = GeneticPopulation(self.graph, self.weighs, size, False)
             selection.population = elites + tails
         elif selection_type == "random":
             num_elites = int(math.floor(size * 0.50))
@@ -70,10 +138,28 @@ class GeneticPopulation(object):
                 else:
                     continue
 
-            selection = GeneticPopulation(self.graph, self.weighs, self.size, False)
+            selection = GeneticPopulation(self.graph, self.weighs, size, False)
             selection.population = winners
 
         return selection
+
+    def select(self):
+        return self.population[random.randrange(self.size)]
+
+    def reproduce(self, cross_type="one_point"):
+        children = []
+        if cross_type == "one_point":
+            for _ in range(self.size):
+                parent_a = self.select()
+                parent_b = self.select()
+
+                child_a, child_b = parent_a.crossover(parent_b, cross_type)
+                child_a.mutate()
+                child_b.mutate()
+                children.append(child_a)
+                children.append(child_b)
+
+        return children
 
     def __str__(self):
         result = ""
@@ -85,7 +171,7 @@ class GeneticPopulation(object):
 
 class GeneticTSP(object):
 
-    def __init__(self, graph, weighs, population=20, generations=500):
+    def __init__(self, graph, weighs, population=20, generations=50):
         self.graph = graph
         self.weighs = weighs
         self.psize = population
@@ -96,8 +182,16 @@ class GeneticTSP(object):
 
     def solve(self):
         print "Solving"
-        selection = self.population.selection(5, "random")
-        print selection
+
+        for idx in range(self.generations):
+            print "Generation %d:" % idx
+            selection = self.population.selection(5, "random")
+            children = selection.reproduce()
+            self.population.population += children
+
+            self.population = self.population.selection(self.psize, "random")
+
+            print self.population
 
     def __str__(self):
         result = "Possible solutions (Tours):\n"
