@@ -85,13 +85,32 @@ class GeneticIndividual(object):
         return (GeneticIndividual(self.cities, self.weighs, new_tour_one),
                 GeneticIndividual(self.cities, self.weighs, new_tour_two))
 
-    def mutate(self, mutation_type="swap"):
+    def mutate(self, mutation_type="swap", psize=2):
         if mutation_type == "swap":
             index_a = random.randrange(self.size)
             index_b = random.randrange(self.size)
             temp = self.tour[index_b]
             self.tour[index_b] = self.tour[index_a]
             self.tour[index_a] = temp
+        elif mutation_type == "insertion":
+            index_a = random.randrange(self.size)
+            index_b = random.randrange(self.size-1)
+            value = self.tour.pop(index_a)
+            self.tour.insert(index_b, value)
+        elif mutation_type == "shift":
+            index_a = random.randrange(self.size-psize+1)
+            index_b = random.randrange(self.size-psize-psize+1)
+            subpath = self.tour[index_a:index_a + psize]
+
+            self.tour[index_a:index_a + psize] = []
+
+            if index_b == 0:
+                self.tour = subpath + self.tour
+            else:
+                self.tour[index_b:1] = subpath
+
+    def __str__(self):
+        return str(self.tour)
 
     @classmethod
     def random(cls, cities, weighs):
