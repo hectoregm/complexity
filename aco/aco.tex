@@ -1,0 +1,51 @@
+\documentclass{article}
+\usepackage[left=2cm,right=2cm,top=3cm,bottom=3cm,letterpaper]{geometry}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage{verbatim, array}
+\usepackage{hyperref}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsthm}
+\newtheorem{theorem}{Teorema}
+
+
+\newcommand{\jimage}[2]{\includegraphics[width=#1\textwidth]{#2}\vskip10pt}
+\newcommand{\jcimage}[2]{\begin{center}\includegraphics[width=#1\textwidth]{#2}\end{center}\vskip10pt}
+
+\author{Héctor Enrique Gómez Morales}
+\title{An ant-based algorithm for coloring graphs - Bui, Nguyen, Patel, Phan}
+\begin{document}
+\maketitle
+\section{Introducción}
+Al inicio del articulo se tiene la definicion de varias conceptos basicos para el problema:
+
+\begin{itemize}
+  \item \textbf{coloracion propia (por vertices)} es la asignacion de los vertices de una grafica con colores tales que cualesquiera dos vertices adyacentes tengan colores diferentes.
+  \item \textbf{k-coloracion} cuando una coloracion usa a los mas $k$ colores.
+  \item \textbf{numero cromatico} el menor numero de colores necesarios para colorear una grafica, se denota como $\chi(G)$.
+  \item \textbf{colision} cuando dos vertices adyacentes tienen el mismo color.
+\end{itemize}
+
+El problema de coloracion (graph coloring problem) es el problema de encontrar el numero cromatico de una grafica $G$. Se sabe que este problema es \texttt{NP-hard}, en particular se sabe que el tratar de determinar si una grafica puede ser coloreada con tres colores es un problema \texttt{NP-C}.
+
+Se tiene que dado que es un problema $NP-C$ y los algoritmos de aproximacion que se tienen no son muy buenos se ha realizado mucho trabajo en el diseño de heuristicas para tratar de resolver el problema.
+
+En el articulo de Bui se pone a consideracion una heuristica basada en hormigas para resolver el problema de coloracion.
+
+\section{Idea Principal}
+La idea principal de la heuristica que postula Bui es que se utiliza un conjunto de hormigas que se distribuyen aleatoriamente sobre la grafica, cada hormiga sigue una lista de reglas para colorear su parte de la grafica. Es decir a diferencia de otras heuristicas propuestas cada hormiga solo colorea una porcion de la grafica y no toda la grafica completa. Bui dice que esto presenta la ventaja de permitir una implementacion distribuida.
+
+El algoritmo se puede reducir a lo siguiente:
+\begin{itemize}
+  \item Se obtiene una k-coloracion propia, Bui recomienda su modificacion del algoritmo \texttt{XRLF} pero en realidad es solo necesario obtener una coloracion propia.
+  \item De la k-coloracion propia obtenida en el paso anterior se induce una coloracion con un numero menor a k de colores. Esta coloracion puede ser no propia, es decir puede haber colisiones en la grafica.
+  \item Se empieza n ciclos, en cada ciclo cada hormiga intenta colorear su porcion de la grafica usando el conjunto de colores definido anteriormente.
+  \item Si al final del ciclo se tiene una coloracion propia, es decir no hay colisiones entonces se reduce en uno el numero de colores disponible, en caso contrario se incrementa el numero de colores disponibles.
+\end{itemize}
+
+En un algoritmo tipico de hormigas (ant colony optimization \textbf{ACO}) se hace uso del concepto de feromona que es usada por las hormigas para decidir su accion a realizar, se puede decir que la feromona actua como una memoria que permite a las hormigas el construir mejores soluciones, el algoritmo propuesto por Bui a primera vista no es un algoritmo ACO tipico puesto que en ningun paso del algoritmo se hace mencion de feronoma o de una estructura parecida.
+\end{document}
